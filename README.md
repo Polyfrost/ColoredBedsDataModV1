@@ -1,16 +1,11 @@
-# OneConfigExampleMod
+# ColoredBedsData
 
-![Powered by OneConfig](https://polyfrost.org/media/branding/badges/badge_1.svg)
-![Compact Powered by OneConfig](https://polyfrost.org/media/branding/badges/badge_2.svg)
-![Minimal Powered by OneConfig](https://polyfrost.org/media/branding/badges/badge_3.svg)
-![Minimal Compact Powered by OneConfig](https://polyfrost.org/media/branding/badges/badge_4.svg)
+Fabric 26.3 client mod that visits every Hypixel Bed Wars map and records which bed color is on each side of the map, for the colored beds feature (`bed_locations.json`).
 
-Example mod implementing OneConfig.
+Needs the [Hypixel Mod API](https://modrinth.com/mod/hypixel-mod-api) mod installed, and MVP+ or higher since the map selector is only unlimited from that rank.
 
-## How to use
+## Usage
 
-- Copy the template either by using GitHub's "Use this template" feature or downloading the repo manually.
-- **Remove the license named "LICENSE-TEMPLATE" and choose a new one.**
-- Refactor the template (specifically, the modid, version and name in the gradle.properties and most of the class names)
-  to a different name.
-- Have fun modding! :D
+- Join Hypixel and run `/coloredbedsdata start`.
+- Progress is saved to `config/coloredbedsdata/progress.json`, so `start` resumes. `reset` clears it.
+- When done (or with `/coloredbedsdata export`) it merges the results into the current upstream file and writes `config/coloredbedsdata/bed_locations.json`, listing every map that changed.

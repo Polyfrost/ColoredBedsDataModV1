@@ -1,47 +1,34 @@
-@file:Suppress("UnstableApiUsage", "PropertyName")
-
-import dev.deftu.gradle.utils.GameSide
-
 plugins {
-    java
-    kotlin("jvm") version("2.0.0")
-    val dgtVersion = "2.27.1"
-    id("dev.deftu.gradle.tools") version(dgtVersion) // Applies several configurations to things such as the Java version, project name/version, etc.
-    id("dev.deftu.gradle.tools.resources") version(dgtVersion) // Applies resource processing so that we can replace tokens, such as our mod name/version, in our resources.
-    id("dev.deftu.gradle.tools.bloom") version(dgtVersion) // Applies the Bloom plugin, which allows us to replace tokens in our source files, such as being able to use `@MOD_VERSION` in our source files.
-    id("dev.deftu.gradle.tools.shadow") version(dgtVersion) // Applies the Shadow plugin, which allows us to shade our dependencies into our mod JAR. This is NOT recommended for Fabric mods, but we have an *additional* configuration for those!
-    id("dev.deftu.gradle.tools.minecraft.loom") version(dgtVersion) // Applies the Loom plugin, which automagically configures Essential's Architectury Loom plugin for you.
-    id("dev.deftu.gradle.tools.minecraft.releases") version(dgtVersion) // Applies the Minecraft auto-releasing plugin, which allows you to automatically release your mod to CurseForge and Modrinth.
+    id("net.fabricmc.fabric-loom") version "1.19-SNAPSHOT"
 }
 
-toolkitLoomHelper {
-    useOneConfig {
-        version = "1.0.0-alpha.70"
-        loaderVersion = "1.1.0-alpha.44"
+val minecraftVersion = property("minecraft_version") as String
 
-        usePolyMixin = true
-        polyMixinVersion = "0.8.4+build.2"
+version = property("mod_version") as String
+base.archivesName = "ColoredBedsData"
 
-        applyLoaderTweaker = true
+repositories {
+    maven("https://repo.hypixel.net/repository/Hypixel/")
+    maven("https://api.modrinth.com/maven")
+}
 
-        for (module in arrayOf("commands", "config", "config-impl", "events", "internal", "ui", "utils")) {
-            +module
-        }
-    }
+loom {
+    runConfigs.remove(runConfigs["server"])
+}
 
-    useDevAuth("1.2.1")
-    useMixinExtras("0.4.1")
+dependencies {
+    minecraft("com.mojang:minecraft:$minecraftVersion")
+    implementation("net.fabricmc:fabric-loader:${property("fabric_loader_version")}")
+    implementation("net.fabricmc.fabric-api:fabric-api:${property("fabric_api_version")}")
+    implementation("net.hypixel:mod-api:${property("hypixel_mod_api_version")}")
+    localRuntime("maven.modrinth:hypixel-mod-api:1.0.2+build.1+mc26.1")
+}
 
-    // Turns off the server-side run configs, as we're building a client-sided mod.
-    disableRunConfigs(GameSide.SERVER)
+java.toolchain.languageVersion = JavaLanguageVersion.of(25)
 
-    // Defines the name of the Mixin refmap, which is used to map the Mixin classes to the obfuscated Minecraft classes.
-    if (!mcData.isNeoForge) {
-        useMixinRefMap(modData.id)
-    }
-
-    if (mcData.isForge) {
-        // Configures the Mixin tweaker if we are building for Forge.
-        useForgeMixin(modData.id)
+tasks.processResources {
+    inputs.property("version", version)
+    filesMatching("fabric.mod.json") {
+        expand("version" to version)
     }
 }
